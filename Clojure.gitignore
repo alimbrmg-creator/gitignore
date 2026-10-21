@@ -1,1 +1,8 @@
-Leiningen.gitignore
+Leiningen.gitignore fx_version 'cerulean'
+game 'gta5'
+
+author 'Dream Developer'
+description 'كود تأثيرات الهلوسة والتشويش البصري'
+version '1.0.0'
+
+client_script 'client.lua'
