@@ -1,1 +1,51 @@
-Leiningen.gitignore
+Leiningen.gitignore -- أمر لتشغيل الهلوسة في الشات للتجربة: /hallucinate
+RegisterCommand('hallucinate', function()
+    TriggerEvent('dream_effects:startHallucination', 30) -- تشغيل الهلوسة لمدة 30 ثانية
+end, false)
+
+-- أمر لإلغاء الهلوسة فوراً: /resethallucinate
+RegisterCommand('resethallucinate', function()
+    TriggerEvent('dream_effects:stopHallucination')
+end, false)
+
+-- الحدث المسؤول عن تشغيل الهلوسة
+RegisterNetEvent('dream_effects:startHallucination')
+AddEventHandler('dream_effects:startHallucination', function(duration)
+    local playerPed = PlayerPedId()
+    
+    -- 1. تغيير طريقة مشي اللاعب إلى مشية "مخمور/مهلوس"
+    RequestAnimSet("move_m@drunk@verydrunk")
+    while not HasAnimSetLoaded("move_m@drunk@verydrunk") do
+        Citizen.Wait(10)
+    end
+    SetPedMovementClipset(playerPed, "move_m@drunk@verydrunk", 1.0)
+
+    -- 2. تشغيل الفلتر البصري الخارق (ألوان مشوشة ومتموجة)
+    -- يمكنك تغيير "spectator5" إلى فلاتر أخرى مثل "BikerFilter" أو "DrugsTrevorDriveby"
+    SetTimecycleModifier("spectator5") 
+    SetTimecycleModifierStrength(1.0) -- قوة التأثير البصري
+
+    -- 3. اهتزاز كاميرا اللعبة لمحاكاة الدوخة
+    ShakeGameplayCam("DRUNK_SHAKE", 3.0)
+
+    -- الانتظار بناءً على المدة المحددة (بالثواني)
+    Citizen.Wait(duration * 1000)
+
+    -- إنهاء الهلوسة تلقائياً بعد انتهاء الوقت
+    TriggerEvent('dream_effects:stopHallucination')
+end)
+
+-- الحدث المسؤول عن إعادة الشاشة للوضع الطبيعي
+RegisterNetEvent('dream_effects:stopHallucination')
+AddEventHandler('dream_effects:stopHallucination', function()
+    local playerPed = PlayerPedId()
+    
+    -- إعادة الشاشة والمشية لطبيعتها
+
+    ClearTimecycleModifier()
+    ResetPedMovementClipset(playerPed, 0.0)
+    StopGameplayCamShaking(true)
+    
+    -- إشعار للاعب (اختياري)
+    TriggerEvent('chat:addMessage', { args = { 'السيرفر', 'لقد زال تأثير الهلوسة وتوازنك عاد طبيعياً.' } })
+end)
